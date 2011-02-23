@@ -327,6 +327,21 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 	}
 
+	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+		// Now that the size is known, set up the camera parameters and begin
+		// the preview.
+		Camera.Parameters parameters = mCamera.getParameters();
+		parameters.setPreviewSize(320, 240);
+		parameters.setPreviewFrameRate(15);
+		// night mode and auto focus are not available in 1.6
+		// enable only if android 2.0 +
+		// TODO: detect 2.0+
+		//parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
+		//parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+		mCamera.setParameters(parameters);
+		mCamera.startPreview();
+	}
+
 	public void surfaceCreated(SurfaceHolder holder) {
 		mCamera = Camera.open();
 		try {
@@ -369,18 +384,5 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mCamera = null;
 	}
 
-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        // Now that the size is known, set up the camera parameters and begin
-        // the preview.
-        Camera.Parameters parameters = mCamera.getParameters();
-        parameters.setPreviewSize(320, 240);
-        parameters.setPreviewFrameRate(15);
-		// night mode and auto focus are not available in 1.6
-		// enable only if android 2.0 +
-        //parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
-        //parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-        mCamera.setParameters(parameters);
-        mCamera.startPreview();
-    }
 
 }
