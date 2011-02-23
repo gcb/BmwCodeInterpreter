@@ -29,8 +29,9 @@ public class BmwCodeInterpreterActivity extends Activity {
 	@Override public void onCreate( Bundle savedInstanceState ){
 		super.onCreate(savedInstanceState);
 		// Hide the window title.
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		// Full Screen
 		//getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		// Create our Preview view and set it as the content of our activity.
 		// Create our DrawOnTop view.
@@ -101,9 +102,9 @@ class DrawOnTop extends View {
 	}
 
 	@Override protected void onDraw(Canvas canvas) {
+		int canvasWidth = getWidth(); //code i copied this from was wrongly using canvas.getWidth/Height... that will get the screen size. view.getH/W will get the usable size
+		int canvasHeight = getHeight();
 		if (mBitmap != null) {
-			int canvasWidth = canvas.getWidth();
-			int canvasHeight = canvas.getHeight();
 			int newImageWidth = canvasWidth;
 			int newImageHeight = canvasHeight;
 			int marginWidth = (canvasWidth - newImageWidth)/2;
