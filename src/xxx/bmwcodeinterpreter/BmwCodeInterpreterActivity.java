@@ -225,7 +225,7 @@ class DrawOnTop extends View {
 		final int frameSize = width * height;
 
 		for (int j = 0, yp = 0; j < height; j++) {
-			int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
+			int uvp = n frameSize + (j >> 1) * width, u = 0, v = 0;
 			for (int i = 0; i < width; i++, yp++) {
 				int y = (0xff & ((int) yuv420sp[yp])) - 16;
 				if (y < 0) y = 0;
@@ -260,9 +260,18 @@ class DrawOnTop extends View {
 	}
 
 	static public void calculateIntensityHistogram(int[] rgb, int[] histogram, int width, int height, int component) {
+		// TODO: if we optimize the data format to be 3 arrays holding just one byte each for R, G, and B
+		// we can drop all the overhead of shiffiting and masking down here.
+		// ...might not be worth anything, so do not optimize before measuring.
 		for (int bin = 0; bin < 256; bin++) {
 			histogram[bin] = 0;
 		} // bin
+
+		/* pixels came in the format 0xAARRGGBB, ex: 0xffaaffaa
+		 * so to get red, shift 16 (2byte) to the right (dropping green and blue), and then mask only the last byte (dropping alpha).
+		 * etc.
+		 *
+		 */
 		if (component == 0){ // red
 			for (int pix = 0; pix < width*height; pix += 3) {
 				int pixVal = (rgb[pix] >> 16) & 0xff;
