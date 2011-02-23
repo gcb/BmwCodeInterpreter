@@ -331,12 +331,11 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mCamera = Camera.open();
 		try {
 			mCamera.setPreviewDisplay(holder);
-
 			// Preview callback used whenever new viewfinder frame is available
 			mCamera.setPreviewCallback(new PreviewCallback() {
 				public void onPreviewFrame(byte[] data, Camera camera) {
 					if ( (mDrawOnTop == null) || mFinished ){
-					return;
+						return;
 					}
 					if (mDrawOnTop.mBitmap == null) {
 						// Initialize the draw-on-top companion
@@ -359,16 +358,16 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        // Surface will be destroyed when we return, so stop the preview.
-        // Because the CameraDevice object is not a shared resource, it's very
-        // important to release it when the activity is paused.
-    	mFinished = true;
-    	mCamera.setPreviewCallback(null);
-        mCamera.stopPreview();
-        mCamera.release();
-        mCamera = null;
-    }
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		// Surface will be destroyed when we return, so stop the preview.
+		// Because the CameraDevice object is not a shared resource, it's very
+		// important to release it when the activity is paused.
+		mFinished = true;
+		mCamera.setPreviewCallback(null);
+		mCamera.stopPreview();
+		mCamera.release();
+		mCamera = null;
+	}
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         // Now that the size is known, set up the camera parameters and begin
