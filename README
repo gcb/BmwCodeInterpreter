@@ -1,0 +1,26 @@
+Android app to interpret the codes for the BMW E34/E30/Others? Stomp test
+
+
+To initialize the stomp test:
+1. turn the ignition key on (do not start the car)
+2. before 5seconds have passed:
+3. fully depress the accelerator pedal to the floor five times
+
+The test starts when the Engine Light remain on for five seconds, blink off, come on for 2.5 seconds, then go off for 2.5 seconds. At this point, the fault codes
+will begin to flash.
+
+Just point the phone camera to the engine light before starting the test And the app will read the codes for you.
+
+References:
+
+http://www.bmw4life.com/stompTest.htm
+
+http://www.bmwe34.net/E34main/Trouble/Engine_codes.htm
+
+
+Troubleshooting, Tips and Comments:
+
+Robert Comments on pelicaparts.com: On my 1993 E36 325i I have to hold the peddle down on the fifth stomp to make the stomp test work. I read somewhere that this is true for the 93 and 94 year models. If the test is not working for you, and you have a pre-96 model, try it before giving up. Pelican, thanks for the code reset step of holding the throttle down after the codes.
+December 7, 2010
+
+
