@@ -2,3 +2,5 @@ bin
 cache
 gen
 *swp
+cache.lock
+proguard.cfg
