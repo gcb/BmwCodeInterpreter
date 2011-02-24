@@ -185,6 +185,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80,prob*barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
+				mPaintRed.setARGB( 128, bin, 0, 0  );
 				canvas.drawRect(barRect, mPaintRed);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
@@ -198,6 +199,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80, ((float)mGreenHistogram[bin])/((float)greenHistogramSum) * barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
+				mPaintGreen.setARGB( 128, 0, bin, 0  );
 				canvas.drawRect(barRect, mPaintGreen);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
@@ -211,6 +213,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80, ((float)mBlueHistogram[bin])/((float)blueHistogramSum) * barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
+				mPaintBlue.setARGB( 128, 0, 0, bin );
 				canvas.drawRect(barRect, mPaintBlue);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
