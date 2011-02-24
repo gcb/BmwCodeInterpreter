@@ -12,8 +12,8 @@
 			</intent-filter>
 		</activity>
 	</application>
-	<uses-sdk android:minSdkVersion="3" /> <!-- NOTE: originally 6. any reason? -->
+	<uses-sdk android:minSdkVersion="10" android:targetSdkVersion="10"/>
 	<uses-permission android:name="android.permission.CAMERA"/>
 	<uses-feature android:name="android.hardware.camera" />
-	<uses-feature android:name="android.hardware.camera.autofocus" />
+	<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 </manifest>

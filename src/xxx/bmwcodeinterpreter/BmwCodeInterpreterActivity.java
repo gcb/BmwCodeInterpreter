@@ -185,7 +185,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80,prob*barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
-				mPaintRed.setARGB( 128, bin, 0, 0  );
+				mPaintRed.setARGB( 256, bin, 0, 0  );
 				canvas.drawRect(barRect, mPaintRed);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
@@ -199,7 +199,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80, ((float)mGreenHistogram[bin])/((float)greenHistogramSum) * barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
-				mPaintGreen.setARGB( 128, 0, bin, 0  );
+				mPaintGreen.setARGB( 256, 0, bin, 0  );
 				canvas.drawRect(barRect, mPaintGreen);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
@@ -213,7 +213,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80, ((float)mBlueHistogram[bin])/((float)blueHistogramSum) * barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
-				mPaintBlue.setARGB( 128, 0, 0, bin );
+				mPaintBlue.setARGB( 256, 0, 0, bin );
 				canvas.drawRect(barRect, mPaintBlue);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
@@ -321,10 +321,18 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		parameters.setPreviewSize(320, 240);
 		parameters.setPreviewFrameRate(15);
 		// night mode and auto focus are not available in 1.6
-		// enable only if android 2.0 +
-		// TODO: detect 2.0+
-		//parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
-		//parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+		// enable only if supported (about 2.0 and up)
+		//if( Context.getPackageManager().hasSystemFeature("android.hardware.camera.autofocus") ){ // non-static method getPackageManager() cannot be referenced from a static context...
+			//if( Camera.getFocusMode() == (Camera.FOCUS_MODE_AUTO || Camera.FOCUS_MODE_MACRO) ){
+				parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+			//}
+			// this should be inside a feature check like we do with auto_focus
+			// but android has no support to check for scene modes. let's just hope the
+			// devices that have auto focus also knows about scenemode
+			//if( Camera.getSceneMode() != null ){
+				parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
+			//}
+		//}
 		mCamera.setParameters(parameters);
 		mCamera.startPreview();
 	}
