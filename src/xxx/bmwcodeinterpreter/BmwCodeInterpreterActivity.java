@@ -131,7 +131,7 @@ class DrawOnTop extends View {
 			double imageRedMean = 0, imageGreenMean = 0, imageBlueMean = 0;
 			double redHistogramSum = 0, greenHistogramSum = 0, blueHistogramSum = 0;
 			for (int bin = 0; bin < 256; bin++) {
-				imageRedMean += mRedHistogram[bin] * bin;
+				imageRedMean += mRedHistogram[bin] * bin; // bin+1 ?
 				redHistogramSum += mRedHistogram[bin];
 				imageGreenMean += mGreenHistogram[bin] * bin;
 				greenHistogramSum += mGreenHistogram[bin];
@@ -157,20 +157,22 @@ class DrawOnTop extends View {
 			double imageBlueStdDev = Math.sqrt( imageBlue2ndMoment - imageBlueMean*imageBlueMean );
 
 			// Draw mean
+			int txtH = 30;
 			String imageMeanStr = "Mean (R,G,B): " + String.format("%.4g", imageRedMean) + ", " + String.format("%.4g", imageGreenMean) + ", " + String.format("%.4g", imageBlueMean);
-			canvas.drawText(imageMeanStr, marginWidth+10-1, 30-1, mPaintBlack);
-			canvas.drawText(imageMeanStr, marginWidth+10+1, 30-1, mPaintBlack);
-			canvas.drawText(imageMeanStr, marginWidth+10+1, 30+1, mPaintBlack);
-			canvas.drawText(imageMeanStr, marginWidth+10-1, 30+1, mPaintBlack);
-			canvas.drawText(imageMeanStr, marginWidth+10, 30, mPaintYellow);
+			canvas.drawText(imageMeanStr, marginWidth+10-1, txtH-1, mPaintBlack);
+			canvas.drawText(imageMeanStr, marginWidth+10+1, txtH-1, mPaintBlack);
+			canvas.drawText(imageMeanStr, marginWidth+10+1, txtH+1, mPaintBlack);
+			canvas.drawText(imageMeanStr, marginWidth+10-1, txtH+1, mPaintBlack);
+			canvas.drawText(imageMeanStr, marginWidth+10, txtH, mPaintYellow);
 
 			// Draw standard deviation
+			txtH += txtH;
 			String imageStdDevStr = "Std Dev (R,G,B): " + String.format("%.4g", imageRedStdDev) + ", " + String.format("%.4g", imageGreenStdDev) + ", " + String.format("%.4g", imageBlueStdDev);
-			canvas.drawText(imageStdDevStr, marginWidth+10-1, 60-1, mPaintBlack);
-			canvas.drawText(imageStdDevStr, marginWidth+10+1, 60-1, mPaintBlack);
-			canvas.drawText(imageStdDevStr, marginWidth+10+1, 60+1, mPaintBlack);
-			canvas.drawText(imageStdDevStr, marginWidth+10-1, 60+1, mPaintBlack);
-			canvas.drawText(imageStdDevStr, marginWidth+10, 60, mPaintYellow);
+			canvas.drawText(imageStdDevStr, marginWidth-1, txtH-1, mPaintBlack);
+			canvas.drawText(imageStdDevStr, marginWidth+1, txtH-1, mPaintBlack);
+			canvas.drawText(imageStdDevStr, marginWidth+1, txtH+1, mPaintBlack);
+			canvas.drawText(imageStdDevStr, marginWidth-1, txtH+1, mPaintBlack);
+			canvas.drawText(imageStdDevStr, marginWidth, txtH, mPaintYellow);
 
 			// Draw red intensity histogram
 			float barMaxHeight = 3000;
@@ -185,7 +187,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80,prob*barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
-				mPaintRed.setARGB( 256, bin, 0, 0  );
+				mPaintRed.setARGB( 255, bin, 0, 0  );
 				canvas.drawRect(barRect, mPaintRed);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
@@ -199,7 +201,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80, ((float)mGreenHistogram[bin])/((float)greenHistogramSum) * barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
-				mPaintGreen.setARGB( 256, 0, bin, 0  );
+				mPaintGreen.setARGB( 255, 0, bin, 0  );
 				canvas.drawRect(barRect, mPaintGreen);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
@@ -213,7 +215,7 @@ class DrawOnTop extends View {
 				barRect.top = barRect.bottom - Math.min(80, ((float)mBlueHistogram[bin])/((float)blueHistogramSum) * barMaxHeight) - barMarginHeight;
 				canvas.drawRect(barRect, mPaintBlack);
 				barRect.top += barMarginHeight;
-				mPaintBlue.setARGB( 256, 0, 0, bin );
+				mPaintBlue.setARGB( 255, 0, 0, bin );
 				canvas.drawRect(barRect, mPaintBlue);
 				barRect.left += barWidth;
 				barRect.right += barWidth;
