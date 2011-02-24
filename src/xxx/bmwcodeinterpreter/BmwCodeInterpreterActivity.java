@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.ViewGroup.LayoutParams;
+import android.text.format.Time;
 
 
 public class BmwCodeInterpreterActivity extends Activity {
@@ -61,8 +62,23 @@ class DrawOnTop extends View {
 	int[] mBlueHistogram;
 	double[] mBinSquared;
 
+	Time time;
+	long lastTime;
+	long phaseStartTime;
+	int phase; //-1 init; 0 noise detection; 1 light detection; 2 pattern confirmation; 3 code reading
+	long ticks;
+	long ticks2;
+
+	double noiseMin;
+	double noiseMax;
+
 	public DrawOnTop(Context context) {
 		super(context);
+
+		time = new Time();
+		lastTime = time.toMillis(false);
+		phase = -1;
+		ticks = 0;
 
 		mPaintBlack = new Paint();
 		mPaintBlack.setStyle(Paint.Style.FILL);
@@ -102,7 +118,7 @@ class DrawOnTop extends View {
 	}
 
 	@Override protected void onDraw(Canvas canvas) {
-		int canvasWidth = getWidth(); //code i copied this from was wrongly using canvas.getWidth/Height... that will get the screen size. view.getH/W will get the usable size
+		int canvasWidth = getWidth();
 		int canvasHeight = getHeight();
 		if (mBitmap != null) {
 			int newImageWidth = canvasWidth;
@@ -142,37 +158,95 @@ class DrawOnTop extends View {
 			imageGreenMean /= greenHistogramSum;
 			imageBlueMean /= blueHistogramSum;
 
-			// Calculate second moment
-			double imageRed2ndMoment = 0, imageGreen2ndMoment = 0, imageBlue2ndMoment = 0;
-			for (int bin = 0; bin < 256; bin++) {
-				imageRed2ndMoment += mRedHistogram[bin] * mBinSquared[bin];
-				imageGreen2ndMoment += mGreenHistogram[bin] * mBinSquared[bin];
-				imageBlue2ndMoment += mBlueHistogram[bin] * mBinSquared[bin];
-			} // bin
-			imageRed2ndMoment /= redHistogramSum;
-			imageGreen2ndMoment /= greenHistogramSum;
-			imageBlue2ndMoment /= blueHistogramSum;
-			double imageRedStdDev = Math.sqrt( imageRed2ndMoment - imageRedMean*imageRedMean );
-			double imageGreenStdDev = Math.sqrt( imageGreen2ndMoment - imageGreenMean*imageGreenMean );
-			double imageBlueStdDev = Math.sqrt( imageBlue2ndMoment - imageBlueMean*imageBlueMean );
+			// Stomp test will start with light on for 2.5 seconds, off for 2.5, then on again for another 2.5
+			// we need to calibrate the threshold of mean RED by that
+			if( phase < 0 ){
+				ticks = 0;
+				ticks2 = 0;
+				noiseMin = 255;
+				noiseMax = 0;
+				phase = 0;
+				phaseStartTime = time.toMillis(false);
+			}else if( phase == 0 ){ // noise detection
+				// in here we try to determine the amount of noise on the red histogram for 0.5 seconds
+				ticks++;
+				if( imageRedMean < noiseMin ){ noiseMin = imageRedMean; }
+				if( imageRedMean > noiseMax ){ noiseMax = imageRedMean; }
+				if( (phaseStartTime + 500) > lastTime && ticks > 5 ){ //use whatever is necessary to get at least 5 samples
+					// 0.5 seconds have passed, check if we are still under the noise ratio for another 0.25
+					if( (noiseMin > imageRedMean )
+					||  (noiseMax < imageRedMean ) ){ // we're out of the noise levels... recheck
+						phase = -1;
+					}else if( noiseMin+20 < noiseMax ){ // too much noise
+						phase = -1;
+					}else{
+						if( (phaseStartTime + 250) > lastTime && ticks2 > 2){ // 1/4sec or minimum 2 samplings
+							phase = 1;
+						}
+					}
+				}
+			}else if( phase == 1 ){ // light detection
+				// try to detect a peak of RED, above noise, that last exactly 2.5 seconds
 
-			// Draw mean
+				//after detecting peak, start timer
+				//if peak last less than 2.5, ignore.
+				//if peak last 2.5 and then go off, go to phase 2
+			}else if( phase == 2 ){ // confirmation
+				// confirm the previous light by not detecting the peak for another 2.5 seconds. but detecting after that time.
+				
+				// wait 2.5 secconds,
+				// if detect same PEAK on red, move to phase 1
+				// if no peak is detected at 2.5 interval, check on next 0.01 second.
+				// if peak is detected, go to phase 3
+			}else if( phase == 3 ){ // code reading
+
+			}
+
+
+
+
+
+			// disabled, no idea what's the meaning of this. i'm dumb and sleepy
+			// Calculate second moment
+			//double imageRed2ndMoment = 0, imageGreen2ndMoment = 0, imageBlue2ndMoment = 0;
+			//for (int bin = 0; bin < 256; bin++) {
+			//	imageRed2ndMoment += mRedHistogram[bin] * mBinSquared[bin];
+			//	imageGreen2ndMoment += mGreenHistogram[bin] * mBinSquared[bin];
+			//	imageBlue2ndMoment += mBlueHistogram[bin] * mBinSquared[bin];
+			//} // bin
+			//imageRed2ndMoment /= redHistogramSum;
+			//imageGreen2ndMoment /= greenHistogramSum;
+			//imageBlue2ndMoment /= blueHistogramSum;
+			//double imageRedStdDev = Math.sqrt( imageRed2ndMoment - imageRedMean*imageRedMean );
+			//double imageGreenStdDev = Math.sqrt( imageGreen2ndMoment - imageGreenMean*imageGreenMean );
+			//double imageBlueStdDev = Math.sqrt( imageBlue2ndMoment - imageBlueMean*imageBlueMean );
+
+			// Draw red mean
 			int txtH = 30;
-			String imageMeanStr = "Mean (R,G,B): " + String.format("%.4g", imageRedMean) + ", " + String.format("%.4g", imageGreenMean) + ", " + String.format("%.4g", imageBlueMean);
+			String imageMeanStr = "Mean (min,now,max): " + String.format("%.4g", noiseMin) + ", " + String.format("%.4g", imageRedMean) + ", " + String.format("%.4g", noiseMax) + " ticks: " + String.format("%d", ticks);
 			canvas.drawText(imageMeanStr, marginWidth+10-1, txtH-1, mPaintBlack);
 			canvas.drawText(imageMeanStr, marginWidth+10+1, txtH-1, mPaintBlack);
 			canvas.drawText(imageMeanStr, marginWidth+10+1, txtH+1, mPaintBlack);
 			canvas.drawText(imageMeanStr, marginWidth+10-1, txtH+1, mPaintBlack);
 			canvas.drawText(imageMeanStr, marginWidth+10, txtH, mPaintYellow);
 
-			// Draw standard deviation
+			//// Draw standard deviation
+			//txtH += txtH;
+			//String imageStdDevStr = "Std Dev (R,G,B): " + String.format("%.4g", imageRedStdDev) + ", " + String.format("%.4g", imageGreenStdDev) + ", " + String.format("%.4g", imageBlueStdDev);
+			//canvas.drawText(imageStdDevStr, marginWidth-1, txtH-1, mPaintBlack);
+			//canvas.drawText(imageStdDevStr, marginWidth+1, txtH-1, mPaintBlack);
+			//canvas.drawText(imageStdDevStr, marginWidth+1, txtH+1, mPaintBlack);
+			//canvas.drawText(imageStdDevStr, marginWidth-1, txtH+1, mPaintBlack);
+			//canvas.drawText(imageStdDevStr, marginWidth, txtH, mPaintYellow);
+
+			// Draw light guess
 			txtH += txtH;
-			String imageStdDevStr = "Std Dev (R,G,B): " + String.format("%.4g", imageRedStdDev) + ", " + String.format("%.4g", imageGreenStdDev) + ", " + String.format("%.4g", imageBlueStdDev);
-			canvas.drawText(imageStdDevStr, marginWidth-1, txtH-1, mPaintBlack);
-			canvas.drawText(imageStdDevStr, marginWidth+1, txtH-1, mPaintBlack);
-			canvas.drawText(imageStdDevStr, marginWidth+1, txtH+1, mPaintBlack);
-			canvas.drawText(imageStdDevStr, marginWidth-1, txtH+1, mPaintBlack);
-			canvas.drawText(imageStdDevStr, marginWidth, txtH, mPaintYellow);
+			String imageGuessStr = "Guessing: Phase: " + String.format("%d", phase) + " Light: " + String.format("%B", false );
+			canvas.drawText(imageGuessStr, marginWidth-1, txtH-1, mPaintBlack);
+			canvas.drawText(imageGuessStr, marginWidth+1, txtH-1, mPaintBlack);
+			canvas.drawText(imageGuessStr, marginWidth+1, txtH+1, mPaintBlack);
+			canvas.drawText(imageGuessStr, marginWidth-1, txtH+1, mPaintBlack);
+			canvas.drawText(imageGuessStr, marginWidth, txtH, mPaintYellow);
 
 			// Draw red intensity histogram
 			float barMaxHeight = 3000;
@@ -223,6 +297,8 @@ class DrawOnTop extends View {
 		} // end if statement
 
 		super.onDraw(canvas);
+
+		lastTime = time.toMillis(false);
 
 	} // end onDraw method
 
