@@ -225,7 +225,7 @@ class DrawOnTop extends View {
 		final int frameSize = width * height;
 
 		for (int j = 0, yp = 0; j < height; j++) {
-			int uvp = n frameSize + (j >> 1) * width, u = 0, v = 0;
+			int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
 			for (int i = 0; i < width; i++, yp++) {
 				int y = (0xff & ((int) yuv420sp[yp])) - 16;
 				if (y < 0) y = 0;
